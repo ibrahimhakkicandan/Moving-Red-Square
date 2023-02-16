@@ -1,0 +1,64 @@
+module hw3 ( input clk,
+ input ps2c,
+ input ps2d,
+ 
+ //input pushbutton, //may be used as clock 
+ output logic [2:0] rgb,
+ output logic hsync,
+ output logic vsync
+ );
+ 
+ 
+logic [15:0] data_all;
+logic [3:0] keyout;
+logic ack;
+//memory map is defined here
+localparam BEGINMEM=12'h000,
+ENDMEM=12'h1ff,
+KEYBOARD=12'h900,
+VGA=12'hb00;
+
+// memory chip
+logic [15:0] memory [0:127];
+// cpu's input-output pins
+logic [15:0] data_out;
+logic [15:0] data_in;
+logic [11:0] address;
+logic memwt;
+
+//sevensegment ss1 (); //to be added
+keyboard kb1(clk, ps2c, ps2d, ack, data_in);
+bird br1 (clk,data_in,data_out,address,memwt); //to be added
+vga_sync vga1 (clk, hsync, vsync, rgb);
+//multiplexer for cpu input
+
+always_comb
+if ( (BEGINMEM<=address) && (address<=ENDMEM) )
+begin
+data_in=memory[address];
+end
+else if (address==VGA)
+begin
+data_in=16'hb00;
+end
+else if (address==KEYBOARD)
+begin
+data_in=16'h900;
+end
+else begin
+data_in=16'hf345; //any number
+end
+
+
+
+//multiplexer for cpu output
+always_ff @(posedge clk) //data output port of the cpu
+if (memwt)
+if ( (BEGINMEM<=address) && (address<=ENDMEM) )
+memory[address]<=data_out;
+else if ( VGA==address)
+data_all<=data_out;
+initial begin
+    $readmemh("Text1.txt", memory);
+end
+endmodule

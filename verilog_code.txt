@@ -1,0 +1,68 @@
+.data
+        Xvalue: 320
+        Yvalue: 175
+.code
+        ldi 0 0x0b01
+        ldi 1 Xvalue
+        ld 1 1
+        st 0 1
+        ldi 2 0x0b02
+        ldi 3 Yvalue
+        ld 3 3
+        st 2 3
+        ldi 5 0x0b01
+        ldi 6 0x0b02
+poll
+        ldi 0 0x0901
+        ld 0 0
+        ldi 1 0x0001
+        and 1 0 1
+        jz poll
+        ldi 2 0x0900
+        ld 2 2
+        ldi 3 0x001c
+        sub 3 3 2
+        jz caseA
+        ldi 3 0x0023
+        sub 3 3 2
+        jz caseD
+        ldi 3 0x001d
+        sub 3 3 2
+        jz caseW
+        ldi 3 0x001b
+        sub 3 3 2
+        jz caseS
+        jmp poll
+caseA
+        ldi 2 Xvalue
+        ld 0 2
+        ldi 1 0x0004
+        sub 0 0 1
+        st 2 0
+        st 5 0
+        jmp poll
+caseD
+        ldi 2 Xvalue
+        ld 0 2
+        ldi 1 0x0004
+        add 0 0 1
+        st 2 0
+        st 5 0
+        jmp poll
+caseW
+        ldi 2 Yvalue
+        ld 0 2
+        ldi 1 0x0004
+        sub 0 0 1
+        st 2 0
+        st 6 0
+        jmp poll
+caseS
+        ldi 2 Yvalue
+        ld 0 2
+        ldi 1 0x0004
+        add 0 0 1
+        st 2 0
+        st 6 0
+        jmp poll
+
